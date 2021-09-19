@@ -23,6 +23,7 @@ namespace TestScrollSet.Infrastructure
         class StoreInternal
         {
             public double VerticalOffset { get; set; }
+            public double HorizontalOffset { get; set; }
             //здесь можно добавлять еще свойства и оформлять для них обработчики
         }
         //--------------Update----------------------
@@ -49,25 +50,32 @@ namespace TestScrollSet.Infrastructure
                 }
                 catch { return false; }
             }
-
-            dg.DataContextChanged += delegate
+            void contextChanged()
             {
                 if (updateStore() && GetHasStorage(dg))
+                {
                     viewer?.ScrollToVerticalOffset(store.VerticalOffset);
-            };
-
+                    viewer?.ScrollToHorizontalOffset(store.HorizontalOffset);
+                }
+                   
+            }
+            dg.DataContextChanged += delegate { contextChanged(); };
             dg.Loaded += delegate
             {
                 if (viewer == null)
                 {
-                    updateStore();
                     viewer = dg.Template.FindName("DG_ScrollViewer", dg) as ScrollViewer;
                     if (viewer != null)
                         viewer.ScrollChanged += delegate
                         {
                             if (store != null)
+                            {
                                 store.VerticalOffset = viewer.VerticalOffset;
+                                store.HorizontalOffset = viewer.HorizontalOffset;
+                            }
+                                
                         };
+                    contextChanged();
                 }
             };
         }

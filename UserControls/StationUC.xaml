@@ -32,8 +32,7 @@
                
                   infr:xStorage.HasStorage="True"
                           
-                  ap:ScrollViewer.VerticalOffset="{Binding Vertical}"
-                  ap:ScrollViewer.HorizontalOffset="{Binding Horizontal}"
+                 
                         
                 CanUserSortColumns="True" RowDetailsVisibilityMode="Visible"
                           EnableColumnVirtualization="True"
