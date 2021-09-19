@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Threading;
 
 namespace TestScrollSet.Infrastructure
 {
@@ -55,10 +56,14 @@ namespace TestScrollSet.Infrastructure
                 if (updateStore() && GetHasStorage(dg))
                 {
                     viewer?.ScrollToVerticalOffset(store.VerticalOffset);
-                    viewer?.ScrollToHorizontalOffset(store.HorizontalOffset);
+                    double hor = store.HorizontalOffset;
+                    dg.Dispatcher.BeginInvoke(DispatcherPriority.ApplicationIdle, new Action(() =>
+                    {
+                        viewer?.ScrollToHorizontalOffset(hor);
+                    }));
                 }
-                   
             }
+
             dg.DataContextChanged += delegate { contextChanged(); };
             dg.Loaded += delegate
             {
