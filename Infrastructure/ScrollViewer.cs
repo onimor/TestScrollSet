@@ -1,90 +1,12 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Data;
 using System.Windows.Media;
 
 namespace AttachedProperties
 {
     /// <summary>Класс с Attached Property для <see cref="ScrollViewer"/>.</summary>
-    public static class ScrollViewer
+    public static partial class ScrollViewer
     {
-        /// <summary> Приватный класс для связи <see cref="ScrollViewer"/> с <see cref="AssociatedObject"/>.</summary>
-        private class OffsertProxy : DependencyObject
-        {
-
-            /// <summary>
-            /// Вертикальное смещение.
-            /// </summary>
-            public double VerticalOffset
-            {
-                get => (double)GetValue(VerticalOffsetProperty);
-                set => SetValue(VerticalOffsetProperty, value);
-            }
-
-            /// <summary><see cref="DependencyProperty"/> для свойства <see cref="VerticalOffset"/>.</summary>
-            public static readonly DependencyProperty VerticalOffsetProperty =
-                DependencyProperty.Register(nameof(VerticalOffset), typeof(double), typeof(OffsertProxy), new PropertyMetadata(double.NaN, OffsetChanged));
-
-            private static void OffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-            {
-                DependencyProperty offsetProperty;
-                if (e.Property == VerticalOffsetProperty)
-                {
-                    offsetProperty = AttachedProperties.ScrollViewer.VerticalOffsetProperty;
-                }
-                else if (e.Property == HorizontalOffsetProperty)
-                {
-                    offsetProperty = AttachedProperties.ScrollViewer.HorizontalOffsetProperty;
-                }
-                else
-                {
-                    throw new Exception("Чёрт знает, что произошло!");
-                }
-                ((OffsertProxy)d).AssociatedObject.SetValue(offsetProperty, e.NewValue);
-            }
-
-
-            /// <summary>
-            /// Горизонтальное смещение.
-            /// </summary>
-            public double HorizontalOffset
-            {
-                get => (double)GetValue(HorizontalOffsetProperty);
-                set => SetValue(HorizontalOffsetProperty, value);
-            }
-
-            /// <summary><see cref="DependencyProperty"/> для свойства <see cref="HorizontalOffset"/>.</summary>
-            public static readonly DependencyProperty HorizontalOffsetProperty =
-                DependencyProperty.Register(nameof(HorizontalOffset), typeof(double), typeof(OffsertProxy), new PropertyMetadata(double.NaN, OffsetChanged));
-
-            public DependencyObject AssociatedObject { get; }
-            public System.Windows.Controls.ScrollViewer ScrollViewer { get; }
-
-            public OffsertProxy(DependencyObject associatedObject, System.Windows.Controls.ScrollViewer scrollViewer)
-            {
-                AssociatedObject = associatedObject;
-                ScrollViewer = scrollViewer;
-
-                Binding verticalBinding = new Binding()
-                {
-                    Source = scrollViewer,
-                    Path = new PropertyPath(System.Windows.Controls.ScrollViewer.VerticalOffsetProperty),
-                    Mode = BindingMode.OneWay
-                };
-                Binding horizontalBinding = new Binding()
-                {
-                    Source = scrollViewer,
-                    Path = new PropertyPath(System.Windows.Controls.ScrollViewer.HorizontalOffsetProperty),
-                    Mode = BindingMode.OneWay
-                };
-
-                _ = BindingOperations.SetBinding(this, VerticalOffsetProperty, verticalBinding);
-                _ = BindingOperations.SetBinding(this, HorizontalOffsetProperty, horizontalBinding);
-            }
-        }
-
-
-
         /// <summary>Возвращает значение присоединённого свойства ScrollViewer.VerticalOffset для <paramref name="obj"/>.</summary>
         /// <param name="obj"><see cref="DependencyObject"/> значение свойства которого будет возвращено.</param>
         /// <returns><see cref="double"/> значение свойства.</returns>
@@ -145,6 +67,7 @@ namespace AttachedProperties
             {
                 if (d is FrameworkElement element && !element.IsLoaded)
                 {
+                    element.Loaded -= OnLoaded;
                     element.Loaded += OnLoaded;
                 }
                 else
@@ -187,19 +110,7 @@ namespace AttachedProperties
 
                 if (scrollViewer != null)
                 {
-                    SetProxy(dObj, proxy = new OffsertProxy(dObj, scrollViewer));
-
-                    object vert = dObj.ReadLocalValue(VerticalOffsetProperty);
-                    if (vert != DependencyProperty.UnsetValue)
-                    {
-                        proxy.ScrollViewer.ScrollToVerticalOffset((double)dObj.GetValue(VerticalOffsetProperty));
-                    }
-
-                    object horiz = dObj.ReadLocalValue(HorizontalOffsetProperty);
-                    if (vert != DependencyProperty.UnsetValue)
-                    {
-                        proxy.ScrollViewer.ScrollToVerticalOffset((double)dObj.GetValue(HorizontalOffsetProperty));
-                    }
+                    SetProxy(dObj, /*proxy = */new OffsertProxy(dObj, scrollViewer));
                 }
             }
         }

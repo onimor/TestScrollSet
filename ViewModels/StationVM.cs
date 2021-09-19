@@ -18,19 +18,17 @@ namespace TestScrollSet.ViewModels
             get => _vertical;
             set
             {
-                Set(ref _vertical, value);
                 if (_isVerticalSave && value == 0)
                 {
-                    RecoveryVerticalCroll();
+                    value = RecoveryVerticalCroll();
                 }
-
+                Set(ref _vertical, value);
             }
         }
-        private async void RecoveryVerticalCroll()
+        private double RecoveryVerticalCroll()
         {
-            //await Task.Delay(1);
             _isVerticalSave = false;
-            Vertical = _oldVertical;
+            return _oldVertical;
         }
 
 
@@ -41,18 +39,19 @@ namespace TestScrollSet.ViewModels
             get => _horizontal;
             set
             {
-                Set(ref _horizontal, value);
                 if (_isHorizontalSave && value == 0)
                 {
-                    RecoveryHorizontalCroll();
+                    value = RecoveryHorizontalCroll();
                 }
+                Set(ref _horizontal, value);
             }
         }
-        private async void RecoveryHorizontalCroll()
+       
+        private double RecoveryHorizontalCroll()
         {
             //await Task.Delay(1);
             _isHorizontalSave = false;
-            Horizontal = _oldHorizontal;
+            return _oldHorizontal;
         }
         #endregion
 
