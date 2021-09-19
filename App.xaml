@@ -1,0 +1,24 @@
+﻿<Application x:Class="TestScrollSet.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:typeTeamplate="clr-namespace:TestScrollSet.Infrastructure"
+             xmlns:vm="clr-namespace:TestScrollSet.ViewModels"
+             xmlns:uc="clr-namespace:TestScrollSet.UserControls"
+             xmlns:local="clr-namespace:TestScrollSet"
+             Startup="OnStartap"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <local:Locator x:Key="locator"/>
+
+            <typeTeamplate:TypeTemplateSelector x:Key="PageSelectorTemplate">
+                <DataTemplate x:Key="{x:Type vm:WeightVM}">
+                    <uc:WeightUC/>
+                </DataTemplate>
+                <DataTemplate x:Key="{x:Type vm:StationsNavigationVM}">
+                    <uc:StationsNavigationUC/>
+                </DataTemplate>
+            </typeTeamplate:TypeTemplateSelector>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>
