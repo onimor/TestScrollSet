@@ -9,7 +9,6 @@ namespace AttachedProperties
         /// <summary> Приватный класс для связи <see cref="ScrollViewer"/> с <see cref="AssociatedObject"/>.</summary>
         private class OffsertProxy : DependencyObject
         {
-
             /// <summary>Вертикальное смещение.</summary>
             public double _VerticalOffset
             {
@@ -23,6 +22,8 @@ namespace AttachedProperties
 
             private static void OffsetChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
             {
+                OffsertProxy proxy = (OffsertProxy)d;
+
                 DependencyProperty offsetProperty;
                 if (e.Property == _VerticalOffsetProperty)
                 {
@@ -36,7 +37,8 @@ namespace AttachedProperties
                 {
                     throw new Exception("Чёрт знает, что произошло!");
                 }
-                ((OffsertProxy)d).AssociatedObject.SetValue(offsetProperty, e.NewValue);
+
+                proxy.AssociatedObject.SetValue(offsetProperty, e.NewValue);
             }
 
 
@@ -59,18 +61,6 @@ namespace AttachedProperties
                 AssociatedObject = associatedObject;
                 ScrollViewer = scrollViewer;
 
-                Binding verticalBinding = new Binding()
-                {
-                    Source = scrollViewer,
-                    Path = new PropertyPath(System.Windows.Controls.ScrollViewer.VerticalOffsetProperty),
-                    Mode = BindingMode.OneWay
-                };
-                Binding horizontalBinding = new Binding()
-                {
-                    Source = scrollViewer,
-                    Path = new PropertyPath(System.Windows.Controls.ScrollViewer.HorizontalOffsetProperty),
-                    Mode = BindingMode.OneWay
-                };
 
                 object vert = associatedObject.ReadLocalValue(VerticalOffsetProperty);
                 double vertOffset = scrollViewer.VerticalOffset;
@@ -85,20 +75,16 @@ namespace AttachedProperties
                 {
                     horizOffset = (double)associatedObject.GetValue(HorizontalOffsetProperty);
                 }
-
-                _ = BindingOperations.SetBinding(this, _VerticalOffsetProperty, verticalBinding);
-                _ = BindingOperations.SetBinding(this, _HorizontalOffsetProperty, horizontalBinding);
-
-                OffsetInitAsync(scrollViewer, horizOffset, vertOffset);
+                OffsetInitAsync(this, horizOffset, vertOffset);
             }
 
-            private static async void OffsetInitAsync(System.Windows.Controls.ScrollViewer scrollViewer, double horizontal, double vertical)
+            private static async void OffsetInitAsync(OffsertProxy proxy, double horizontal, double vertical)
             {
                 HV hv = new HV();
                 double horizOld;
                 double vertOld;
 
-                await scrollViewer.Dispatcher.BeginInvoke(GetSizeAction, scrollViewer, hv);
+                await proxy.Dispatcher.BeginInvoke(GetSizeAction, proxy.ScrollViewer, hv);
                 do
                 {
                     double horiz = horizontal;
@@ -107,11 +93,33 @@ namespace AttachedProperties
                     double vert = vertical;
                     if (vert > hv.height)
                         vert = hv.height;
-                    await scrollViewer.Dispatcher.BeginInvoke(SetOffsetAction, scrollViewer, horiz, vertical);
+                    await proxy.Dispatcher.BeginInvoke(SetOffsetAction, proxy.ScrollViewer, horiz, vertical);
                     (horizOld, vertOld) = (hv.horiz, hv.vert);
-                    await scrollViewer.Dispatcher.BeginInvoke(GetOffsetAction, scrollViewer, hv);
+                    await proxy.Dispatcher.BeginInvoke(GetOffsetAction, proxy.ScrollViewer, hv);
                 } while (!(hv.IsEnd || hv.OffsetEquals(horizontal, vertical) || (horizOld, vertOld) == (hv.horiz, hv.vert)));
+
+                await proxy.Dispatcher.BeginInvoke(InitEnd, proxy);
             }
+
+            private static readonly Action<OffsertProxy> InitEnd = proxy =>
+            {
+                Binding verticalBinding = new()
+                {
+                    Source = proxy.ScrollViewer,
+                    Path = new PropertyPath(System.Windows.Controls.ScrollViewer.VerticalOffsetProperty),
+                    Mode = BindingMode.OneWay
+                };
+                Binding horizontalBinding = new()
+                {
+                    Source = proxy.ScrollViewer,
+                    Path = new PropertyPath(System.Windows.Controls.ScrollViewer.HorizontalOffsetProperty),
+                    Mode = BindingMode.OneWay
+                };
+
+                _ = BindingOperations.SetBinding(proxy, _VerticalOffsetProperty, verticalBinding);
+                _ = BindingOperations.SetBinding(proxy, _HorizontalOffsetProperty, horizontalBinding);
+
+            };
 
             private class HV
             {

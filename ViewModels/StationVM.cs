@@ -18,10 +18,10 @@ namespace TestScrollSet.ViewModels
             get => _vertical;
             set
             {
-                if (_isVerticalSave && value == 0)
-                {
-                    value = RecoveryVerticalCroll();
-                }
+                //if (_isVerticalSave && value == 0)
+                //{
+                //    value = RecoveryVerticalCroll();
+                //}
                 Set(ref _vertical, value);
             }
         }
@@ -39,10 +39,10 @@ namespace TestScrollSet.ViewModels
             get => _horizontal;
             set
             {
-                if (_isHorizontalSave && value == 0)
-                {
-                    value = RecoveryHorizontalCroll();
-                }
+                //if (_isHorizontalSave && value == 0)
+                //{
+                //    value = RecoveryHorizontalCroll();
+                //}
                 Set(ref _horizontal, value);
             }
         }
