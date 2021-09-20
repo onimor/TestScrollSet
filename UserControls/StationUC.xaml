@@ -26,13 +26,16 @@
             </Grid.RowDefinitions>
             <!--ap:ScrollViewer.VerticalOffset="{Binding Vertical}"
                   ap:ScrollViewer.HorizontalOffset="{Binding Horizontal}"-->
+
+            <!--infr:xStorage.HasStorage="True"-->
             <Grid Grid.Row="1" Background="#FF1E1E1E">
                 <DataGrid SelectionMode="Single" SelectionUnit="FullRow" 
                 x:Name="dg_glavGrid"   AutoGenerateColumns="False" 
                 CanUserAddRows="False" Margin="0 8 0 0"
                
-                 
-                          infr:xStorage.HasStorage="True"                  
+                  ap:ScrollViewer.VerticalOffset="{Binding Vertical}"
+                  ap:ScrollViewer.HorizontalOffset="{Binding Horizontal}"
+                                            
                         
                 CanUserSortColumns="True" RowDetailsVisibilityMode="Visible"
                           EnableColumnVirtualization="True"
